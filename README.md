@@ -8,3 +8,5 @@
 * DataBinding
 * Navigation
 * Timber
+* ViewModel
+* LiveData
