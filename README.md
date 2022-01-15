@@ -1,1 +1,10 @@
-"#viva-app" 
+# viva-app
+
+
+##
+
+### Libraries
+
+* DataBinding
+* Navigation
+* Timber
