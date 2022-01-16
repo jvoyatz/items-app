@@ -3,6 +3,8 @@ package com.jvoyatz.kotlin.viva.data
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.liveData
+import androidx.lifecycle.map
 import com.jvoyatz.kotlin.viva.data.database.ItemsDao
 import com.jvoyatz.kotlin.viva.data.database.entity.toDomain
 import com.jvoyatz.kotlin.viva.data.remote.ItemsApiService
@@ -33,8 +35,16 @@ class ItemsRepositoryImpl(
         private val api: ItemsApiService,
         private val ioDispatcher: CoroutineDispatcher):ItemsRepository{
 
-    val items: LiveData<List<Item>> = Transformations.map(dao.getItems()){
-        it.toDomain()
+//    val items: LiveData<List<Item>> = Transformations.map(dao.getItems()){
+//        it.toDomain()
+//    }
+
+
+    val items: LiveData<List<Item>> = liveData {
+        val itemsLiveData = dao.getItems()
+        emitSource(itemsLiveData.map {
+            it.toDomain()
+        })
     }
 
     override fun getItemsLiveData(): LiveData<List<Item>> = items
