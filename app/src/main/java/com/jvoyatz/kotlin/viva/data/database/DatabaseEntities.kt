@@ -1,9 +1,17 @@
-package com.jvoyatz.kotlin.viva.data.source.local.entity
+package com.jvoyatz.kotlin.viva.data.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.Collections.list
+import com.jvoyatz.kotlin.viva.domain.Item
 
+/**
+ * Entities for reading and writing from/into the database
+ * exist here
+ */
+
+/**
+ * Represents an item entity in the database
+ */
 @Entity(tableName = "items")
 data class ItemEntity(
     @PrimaryKey
@@ -29,8 +37,23 @@ data class ItemEntity(
             for (i in 1..size){
                list.add(create(i))
             }
-
             return list
         }
+    }
+}
+
+fun ItemEntity.toDomain(): Item{
+    return Item(
+        id = id,
+        name = name,
+        price = price,
+        thumbnail = thumbnail,
+        image = image,
+        description = description
+    )
+}
+fun List<ItemEntity>.toDomain(): List<Item>{
+    return this.map {
+       it.toDomain()
     }
 }

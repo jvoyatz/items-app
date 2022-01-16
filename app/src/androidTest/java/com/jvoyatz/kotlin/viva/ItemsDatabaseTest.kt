@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.jvoyatz.kotlin.viva.data.source.local.ItemsDao
-import com.jvoyatz.kotlin.viva.data.source.local.ItemsDatabase
-import com.jvoyatz.kotlin.viva.data.source.local.entity.ItemEntity
+import com.jvoyatz.kotlin.viva.data.database.ItemsDao
+import com.jvoyatz.kotlin.viva.data.database.ItemsDatabase
+import com.jvoyatz.kotlin.viva.data.database.entity.ItemEntity
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before

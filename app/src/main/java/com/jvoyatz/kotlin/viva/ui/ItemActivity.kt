@@ -8,8 +8,11 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.jvoyatz.kotlin.viva.R
 import com.jvoyatz.kotlin.viva.databinding.ActivityMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 
-class MainActivity : AppCompatActivity() {
+//providing dependencies to this activity
+@AndroidEntryPoint
+class ItemActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 

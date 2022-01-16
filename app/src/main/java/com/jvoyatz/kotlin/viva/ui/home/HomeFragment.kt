@@ -7,8 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.jvoyatz.kotlin.viva.databinding.FragmentHomeBinding
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
+
+//since parent activity of this fragment participates
+//in Hilt injection, then this class needs to be annotated too.
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
@@ -20,9 +26,13 @@ class HomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        viewmodel = ViewModelProvider(this, /*HomeViewModel.Factory(5)*/).get(HomeViewModel::class.java)
+        viewmodel = ViewModelProvider(this).get(HomeViewModel::class.java)
+
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewmodel = viewmodel
 
         return binding.root
     }
@@ -32,6 +42,7 @@ class HomeFragment : Fragment() {
         viewmodel.itemsLiveData.observe(viewLifecycleOwner, {
             Timber.i("dispatched value $it")
         })
+
     }
 
     override fun onDestroyView() {

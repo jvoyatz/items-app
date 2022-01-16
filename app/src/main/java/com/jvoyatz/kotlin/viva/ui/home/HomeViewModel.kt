@@ -1,66 +1,49 @@
 package com.jvoyatz.kotlin.viva.ui.home
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.jvoyatz.kotlin.viva.data.source.remote.VivaApi
+import com.jvoyatz.kotlin.viva.domain.interactors.Interactors
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class HomeViewModel(/*arg: Int*/): ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    val interactors: Interactors
+    ) : ViewModel() {
+
     //encapsulating livedata
-    private val _itemsLiveData = MutableLiveData<String>()
+    private val _itemsLiveData = interactors.getItems.execute()
     val itemsLiveData
         get() = _itemsLiveData
 
     init {
-
-        _itemsLiveData.postValue("test init")
-    }
-
-    fun getItems(){
-        _itemsLiveData.value = "test items"
-//        VivaApi.vivaApiService.getItemsStr().enqueue(object: Callback<String>{
-//            override fun onResponse(call: Call<String>, response: Response<String>) {
-//                _itemsLiveData.value = response.body()
-//            }
-//
-//            override fun onFailure(call: Call<String>, t: Throwable) {
-//                _itemsLiveData.value = "fail: ${t.message}"
-//            }
-//        })
-//        VivaApi.vivaApiService.getItems().enqueue(object: Callback<List<ItemDTO>>{
-//            override fun onResponse(call: Call<List<ItemDTO>>, response: Response<List<ItemDTO>>) {
-//                var str = response.body()?.joinToString { it.toString() }
-//                _itemsLiveData.value = "size ${response.body()?.size} fetched $str"
-//            }
-//
-//            override fun onFailure(call: Call<List<ItemDTO>>, t: Throwable) {
-//                _itemsLiveData.value = "fail: ${t.message}"
-//            }
-//        })
-
         viewModelScope.launch {
+            Timber.d("!!!!!!!!!!!!launching coroutine")
+            delay(20000)
             try {
-                val items = VivaApi.vivaApiService.getItems()
-                var str = items.joinToString { it.toString() }
-                _itemsLiveData.value = "size ${items.size} fetched $str"
+                interactors.initItems()
             }catch (e: Exception){
-                _itemsLiveData.value = "fail: ${e.message}"
+                Timber.e("eee ${e.message}")
             }
         }
     }
 
+    private fun refreshItems() {
+        viewModelScope.launch {
+            interactors.refreshItems()
+        }
+    }
+}
 
-//    class Factory(val arg: Int): ViewModelProvider.Factory{
-//         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-//            return modelClass.getConstructor(Int::class.java)
-//                .newInstance(arg)
+//class Factory(private val application: Application, private val repository: ItemsRepository): ViewModelProvider.Factory {
+//    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+//        if(modelClass.isAssignableFrom(HomeViewModel::class.java)){
+//            return HomeViewModel(application, repository) as T
 //        }
 //
-////        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-////            TODO("Not yet implemented")
-////        }
+//        throw IllegalArgumentException("wrong class")
 //    }
-}
+//}
