@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.jvoyatz.kotlin.viva.data.database.entity.ItemEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ItemsDao {
@@ -20,7 +21,12 @@ interface ItemsDao {
     fun getItems(): LiveData<List<ItemEntity>>
 
     @Query("SELECT * from items ORDER BY id ASC")
+    fun getItemsFlow(): Flow<List<ItemEntity>>
+
+    @Query("SELECT * from items ORDER BY id ASC")
     suspend fun getItemsList(): List<ItemEntity>
+
+
 }
 
 

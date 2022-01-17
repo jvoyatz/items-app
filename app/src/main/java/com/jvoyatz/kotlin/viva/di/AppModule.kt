@@ -7,9 +7,8 @@ import com.jvoyatz.kotlin.viva.data.database.ItemsDao
 import com.jvoyatz.kotlin.viva.data.database.ItemsDatabase
 import com.jvoyatz.kotlin.viva.data.remote.ItemsApiService
 import com.jvoyatz.kotlin.viva.domain.interactors.GetItemsInteractor
-import com.jvoyatz.kotlin.viva.domain.interactors.InitItemsInteractor
+import com.jvoyatz.kotlin.viva.domain.interactors.FetchItemsInteractor
 import com.jvoyatz.kotlin.viva.domain.interactors.Interactors
-import com.jvoyatz.kotlin.viva.domain.interactors.RefreshItemsInteractor
 import com.jvoyatz.kotlin.viva.domain.repository.ItemsRepository
 import com.jvoyatz.kotlin.viva.util.URL
 import com.squareup.moshi.Moshi
@@ -56,6 +55,7 @@ object AppModule {
     }
 
     @Provides
+    @Singleton
     fun provideItemsDao(db: ItemsDatabase): ItemsDao {
         return db.itemsDao
     }
@@ -67,6 +67,7 @@ object AppModule {
                 .build()
 
     @Provides
+    @Singleton
     fun provideRetrofit(moshi: Moshi): Retrofit =
         Retrofit.Builder()
             .baseUrl(URL)
@@ -83,6 +84,7 @@ object AppModule {
 
 
     @Provides
+    @Singleton
     fun provideItemRepository(itemsApiService: ItemsApiService, itemsDao: ItemsDao, dispatcher: CoroutineDispatcher):
             ItemsRepository = ItemsRepositoryImpl(itemsDao, itemsApiService, dispatcher)
 
@@ -90,7 +92,6 @@ object AppModule {
     fun provideItemsInteractors(repository: ItemsRepository) =
         Interactors(
             GetItemsInteractor(repository),
-            InitItemsInteractor(repository),
-            RefreshItemsInteractor(repository),
+            FetchItemsInteractor(repository),
         )
 }

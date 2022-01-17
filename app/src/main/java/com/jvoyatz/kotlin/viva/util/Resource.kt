@@ -1,49 +1,35 @@
 package com.jvoyatz.kotlin.viva.util
 
-sealed class Resource<T>(var data: T? = null, val message: String? = null) {
-    class Success<T>(data:T): Resource<T>(data)
-    class Error<T>(message: String, data: T? = null): Resource<T>(data, message)
-    class Loading<T>(): Resource<T>()
+import retrofit2.HttpException
+import java.net.ConnectException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
+
+sealed class Resource<T>() {
+    class Loading<T>: Resource<T>()
+    data class Success<T>(val data:T): Resource<T>()
+    data class Error<T>(val message: String, val data: T? = null): Resource<T>(){
+
+        companion object{
+            fun <T>  create(e: Throwable): Error<T> {
+                var message: String? = null
+
+                when (e) {
+                    is SocketTimeoutException -> message = "connection error"
+                    is ConnectException -> message = "no internet access"
+                    is UnknownHostException -> message = "no internet access!"
+                }
+
+                if(e is HttpException){
+                    when(e.code()){
+                        in 500 .. 502 -> message = "Internal server error"
+                        400 -> message = "bad request"
+                        404 -> message = "not found"
+                    }
+                }
+                message = message ?: "unknown error exception"
+                return Error(message)
+            }
+        }
+    }
 }
-
-sealed class Result<out T : Any> {
-    data class Success<out T : Any>(val data: T) : Result<T>()
-    data class Error(val exception: Exception) : Result<Nothing>()
-    object InProgress : Result<Nothing>()
-}
-
-
-//companion object{
-//    fun resolveError(e: Exception): State.ErrorState {
-//        var error = e
-//
-//        when (e) {
-//            is SocketTimeoutException -> {
-//                error = NetworkErrorException(errorMessage = "connection error!")
-//            }
-//            is ConnectException -> {
-//                error = NetworkErrorException(errorMessage = "no internet access!")
-//            }
-//            is UnknownHostException -> {
-//                error = NetworkErrorException(errorMessage = "no internet access!")
-//            }
-//        }
-//
-//        if(e is HttpException){
-//            when(e.code()){
-//                502 -> {
-//                    error = NetworkErrorException(e.code(),  "internal error!")
-//                }
-//                401 -> {
-//                    throw AuthenticationException("authentication error!")
-//                }
-//                400 -> {
-//                    error = NetworkErrorException.parseException(e)
-//                }
-//            }
-//        }
-//
-//
-//        return State.ErrorState(error)
-//    }
-//}

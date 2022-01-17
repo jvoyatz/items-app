@@ -17,3 +17,7 @@ data class Item(
     val image: String,
     val description: String?
 )
+
+enum class InitializationState{
+    UNKNOWN, NOT_INITIALIZED, INITIALIZED, ERROR, REFRESH
+}

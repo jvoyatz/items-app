@@ -5,10 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.jvoyatz.kotlin.viva.databinding.FragmentHomeBinding
+import com.jvoyatz.kotlin.viva.domain.InitializationState
+import com.jvoyatz.kotlin.viva.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
@@ -39,8 +45,28 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                viewmodel.initCacheState.collect { state ->
+
+                    when(state){
+                        InitializationState.ERROR -> Timber.d("an error occured")
+                        InitializationState.INITIALIZED -> Timber.d("cache already initialized")
+                        InitializationState.NOT_INITIALIZED -> Timber.d("first time")
+                        InitializationState.REFRESH -> Timber.d("refresh")
+                        else -> Timber.d("unknown")
+                    }
+                }
+            }
+        }
+
         viewmodel.itemsLiveData.observe(viewLifecycleOwner, {
-            Timber.i("dispatched value $it")
+            when(it){
+                is Resource.Loading -> Timber.d("show loading")
+                is Resource.Success -> Timber.d("update adapter")
+                is Resource.Error -> Timber.d("error")
+            }
         })
 
     }

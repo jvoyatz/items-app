@@ -1,18 +1,14 @@
 package com.jvoyatz.kotlin.viva.data
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.liveData
-import androidx.lifecycle.map
 import com.jvoyatz.kotlin.viva.data.database.ItemsDao
 import com.jvoyatz.kotlin.viva.data.database.entity.toDomain
 import com.jvoyatz.kotlin.viva.data.remote.ItemsApiService
-import com.jvoyatz.kotlin.viva.data.source.remote.dto.toEntities
+import com.jvoyatz.kotlin.viva.data.source.remote.dto.toEntity
+import com.jvoyatz.kotlin.viva.domain.InitializationState
 import com.jvoyatz.kotlin.viva.domain.Item
 import com.jvoyatz.kotlin.viva.domain.repository.ItemsRepository
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -35,41 +31,73 @@ class ItemsRepositoryImpl(
         private val api: ItemsApiService,
         private val ioDispatcher: CoroutineDispatcher):ItemsRepository{
 
-//    val items: LiveData<List<Item>> = Transformations.map(dao.getItems()){
-//        it.toDomain()
-//    }
-
-
-    val items: LiveData<List<Item>> = liveData {
-        val itemsLiveData = dao.getItems()
-        emitSource(itemsLiveData.map {
-            it.toDomain()
-        })
+    override fun getItemsDB(): Flow<List<Item>> {
+        return dao.getItemsFlow()
+                .map {
+                    it.toDomain() //converting to domain models
+                }
     }
 
-    override fun getItemsLiveData(): LiveData<List<Item>> = items
+    override fun fetchItems(forceUpdate: Boolean): Flow<InitializationState> {
+        return flow {
+            //while (true) {
+                try {
+                    val state = initItems(forceUpdate)
+                    emit(state)
+                } catch (e: Throwable) {
+                    throw e
+                }
+            //}
+        }
+    }
 
-    override suspend fun initItems() {
-        Timber.d("initItems() called")
-        withContext(Dispatchers.IO) {
+
+    suspend fun initItems(forceUpdate: Boolean): InitializationState{
+        return withContext(ioDispatcher) {
+            Timber.d("${Thread.currentThread()}")
             val dbList = dao.getItemsList()
-            val isEmpty = dbList?.isEmpty() ?: true
-            // if(isEmpty){
-            Timber.d("no items found, fetching items")
-            refreshItems()
-            // }
+            if(forceUpdate || dbList.isEmpty()){
+                Timber.d("no items found, fetching items")
+                val networkItems = api.getItems()
+                dao.insert(networkItems.map { it.toEntity() })
+                return@withContext if (!forceUpdate) {
+                        InitializationState.NOT_INITIALIZED
+                    } else {
+                        InitializationState.REFRESH
+                    }
+            }
+            InitializationState.INITIALIZED
         }
     }
 
-    /**
-     * This methods executes a database operation, so
-     * it is needed to be declared as a suspend function
-     */
-    override suspend fun refreshItems(){
-        withContext(ioDispatcher){
-            Timber.i("refreshing items")
-            val items = api.getItems()
-            dao.insert(items = items.toEntities())
-        }
-    }
+//    override fun fetchItems(): Flow<Boolean> {
+//        return flow {
+//
+//            try {
+//                flow {
+//                    val dbItems = dao.getItemsList()
+//                    val shouldFetch = dbItems?.isEmpty() ?: true
+//                    Timber.d("should fetch ? $shouldFetch")
+//                    if(shouldFetch) {
+//                        val items = api.getItems()
+//                        emit(items)
+//                    }
+//                    emit(listOf())
+//                }
+//                .catch { throw it }
+//                .onEach { news ->
+//                    Timber.d("isEmpty value ? ${news.isEmpty()}")
+//                    if(news.isNotEmpty()) {
+//                        dao.insert(news.toEntities())
+//                    }
+//                }
+//                .flowOn(ioDispatcher)
+//                .collect {
+//                    emit(it.isNotEmpty())
+//                }
+//            }catch (e: Throwable){
+//                emit(false)
+//            }
+//        }
+//    }
 }
