@@ -1,4 +1,4 @@
-# viva-app
+# items-app
 
 
 ### Architecture
