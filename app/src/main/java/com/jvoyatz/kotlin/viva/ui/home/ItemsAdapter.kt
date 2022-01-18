@@ -1,7 +1,6 @@
 package com.jvoyatz.kotlin.viva.ui.home
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -17,7 +16,9 @@ private const val LOADING_ITEM = -1
 private const val HEADER_ITEM = 0
 private const val ADAPTER_ITEM = 1
 
-class ItemsAdapter(diffUtil: ItemDiffUtil, val listener: ItemsListener, val scope: CoroutineScope): ListAdapter<ListAdapterItem, RecyclerView.ViewHolder>(diffUtil) {
+class ItemsAdapter(diffUtil: ItemDiffUtil,
+                   val clickListener: (Item) -> Unit,
+                   val scope: CoroutineScope): ListAdapter<ListAdapterItem, RecyclerView.ViewHolder>(diffUtil) {
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
@@ -33,7 +34,16 @@ class ItemsAdapter(diffUtil: ItemDiffUtil, val listener: ItemsListener, val scop
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType){
             HEADER_ITEM -> HeaderViewHolder.create(parent)
-            ADAPTER_ITEM -> ItemViewHolder.create(parent)
+            ADAPTER_ITEM -> {
+                val inflater = LayoutInflater.from(parent.context)
+                val binding = FragmentHomeListItemBinding.inflate(inflater, parent, false)
+                return ItemViewHolder(binding){
+                    when (val dataItem = getItem(it)){
+                        is ListAdapterItem.AdapterItem -> clickListener(dataItem.item)
+                        else -> {} //do nothing
+                    }
+                }
+            }
             LOADING_ITEM -> LoadingViewHolder.create(parent)
             else -> throw IllegalStateException("error case")
         }
@@ -47,10 +57,10 @@ class ItemsAdapter(diffUtil: ItemDiffUtil, val listener: ItemsListener, val scop
             }
             is ItemViewHolder -> {
                 val adapterItem = getItem(position) as ListAdapterItem.AdapterItem
-                holder.itemView.setOnClickListener {
-                    listener.onClick(adapterItem.item)
-                }
-                holder.bind(adapterItem.item, listener)
+                //holder.itemView.setOnClickListener {
+                //    clickListener.onClick(adapterItem.item)
+                //}
+                holder.bind(adapterItem.item)
             }
         }
     }
@@ -73,17 +83,6 @@ class ItemsAdapter(diffUtil: ItemDiffUtil, val listener: ItemsListener, val scop
         submitList(listOf(ListAdapterItem.Loading))
     }
 }
-
-//abstract class ViewHolder<T: ViewDataBinding, Arg>(val binding: ViewDataBinding): RecyclerView.ViewHolder(binding.root){
-//    fun bind(obj: Arg){
-//        binding.setVariable(BR.obj, obj)
-//    }
-//    companion object{
-//        fun create(parent: ViewGroup){
-//
-//        }
-//    }
-//}
 
 class LoadingViewHolder(binding: ItemsLoadingItemBinding): RecyclerView.ViewHolder(binding.root){
     companion object {
@@ -109,20 +108,17 @@ class HeaderViewHolder(val binding: FragmentHomeListItemHeaderBinding): Recycler
     }
 }
 
-class ItemViewHolder(val binding:FragmentHomeListItemBinding) : RecyclerView.ViewHolder(binding.root){
-    fun bind(item: Item, listener: ItemsListener){
-        binding.apply {
-            this.item = item
-            this.listener = listener
-            executePendingBindings()
+class ItemViewHolder(val binding:FragmentHomeListItemBinding, clickPosition: (Int) -> Unit) : RecyclerView.ViewHolder(binding.root){
+    init {
+        itemView.setOnClickListener {
+            clickPosition(adapterPosition)
         }
     }
-
-    companion object{
-        fun create(parent: ViewGroup): ItemViewHolder{
-            val inflater = LayoutInflater.from(parent.context)
-            val binding = FragmentHomeListItemBinding.inflate(inflater, parent, false)
-            return ItemViewHolder(binding)
+    fun bind(item: Item){
+        binding.apply {
+            this.item = item
+            //this.listener = listener
+            executePendingBindings()
         }
     }
 }

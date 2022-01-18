@@ -46,9 +46,9 @@ class HomeFragment : Fragment() {
         binding.itemsList.layoutManager = LinearLayoutManager(requireContext())
         binding.itemsList.adapter = ItemsAdapter(
                     ItemDiffUtil(),
-                    object : ItemsListener {
-                        override fun onClick(item: Item) {
-                            viewmodel.navigateItemDetails(item)
+                    {
+                        it?.let {
+                            viewmodel.navigateItemDetails(it)
                         }
                     },
                     CoroutineScope(Dispatchers.Default)
