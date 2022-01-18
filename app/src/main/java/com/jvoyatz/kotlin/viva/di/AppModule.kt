@@ -20,6 +20,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
@@ -62,15 +65,28 @@ object AppModule {
 
     @Provides
     fun provideMoshi(): Moshi =
-            Moshi.Builder()
-                .add(KotlinJsonAdapterFactory())
-                .build()
+        Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
+
+
+    @Provides
+    fun providesInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+
+    @Singleton
+    @Provides
+    fun provideOkHttp(interceptor: HttpLoggingInterceptor): OkHttpClient =
+            OkHttpClient.Builder()
+            .addInterceptor(interceptor)
+            .retryOnConnectionFailure(true)
+            .build();
 
     @Provides
     @Singleton
-    fun provideRetrofit(moshi: Moshi): Retrofit =
+    fun provideRetrofit(moshi: Moshi, okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder()
             .baseUrl(URL)
+            .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
 

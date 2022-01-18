@@ -1,5 +1,8 @@
 package com.jvoyatz.kotlin.viva.domain
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
 
 /**
  * Models/Entities found here, are used to display data in
@@ -9,6 +12,7 @@ package com.jvoyatz.kotlin.viva.domain
 /**
  * Represents an item
  */
+@Parcelize
 data class Item(
     val id: Int,
     val name: String,
@@ -16,7 +20,7 @@ data class Item(
     val thumbnail: String,
     val image: String,
     val description: String?
-)
+): Parcelable
 
 enum class InitializationState{
     UNKNOWN, NOT_INITIALIZED, INITIALIZED, ERROR, REFRESH

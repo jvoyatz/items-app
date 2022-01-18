@@ -5,4 +5,8 @@
     <string name="fragment_home_title">Home</string>
     <string name="fragment_detail_title">Details</string>
     <string name="fab_content_descr">Refreshes list content</string>
+    <string name="content_description">content description</string>
+    <string name="items_header_results">Items found</string>
+    <string name="items_header_exhausted">No items found</string>
+    <string name="loading">Loading</string>
 </resources>

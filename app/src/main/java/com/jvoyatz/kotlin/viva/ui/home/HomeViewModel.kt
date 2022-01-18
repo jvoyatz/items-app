@@ -16,6 +16,10 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(val interactors: Interactors) : ViewModel() {
 
+    private val _selectedItem: MutableLiveData<Item?> = MutableLiveData()
+    val selectedItem: LiveData<Item?>
+        get() = _selectedItem
+
     private val _initCacheState = MutableStateFlow(InitializationState.UNKNOWN)
     val initCacheState: StateFlow<InitializationState> = _initCacheState
 
@@ -42,6 +46,13 @@ class HomeViewModel @Inject constructor(val interactors: Interactors) : ViewMode
                     _initCacheState.value = it
                 }
         }
+    }
+
+    fun navigateItemDetails(item: Item) {
+        _selectedItem.value = item
+    }
+    fun onDoneNavigating(){
+        _selectedItem.value = null
     }
 }
 
