@@ -50,7 +50,7 @@ public class HorizontalDottedProgress extends View {
 
         //set the color for the dot that you want to draw
         //Utils.getColorByAttributeId(getContext(), R.attr.colorSecondary)
-        paint.setColor(ContextCompat.getColor(getContext(), R.color.black));
+        paint.setColor(ContextCompat.getColor(getContext(), R.color.secondary_analogous));
         //function to create dot
         createDot(canvas,paint);
     }

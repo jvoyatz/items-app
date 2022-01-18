@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -44,18 +45,29 @@ class HomeFragment : Fragment() {
 
 
         binding.itemsList.layoutManager = LinearLayoutManager(requireContext())
-        binding.itemsList.adapter = ItemsAdapter(
-                    ItemDiffUtil(),
-                    {
-                        it?.let {
-                            viewmodel.navigateItemDetails(it)
-                        }
-                    },
-                    CoroutineScope(Dispatchers.Default)
-                )
+        val itemsAdapter = ItemsAdapter(
+            ItemDiffUtil(),
+            {
+                it?.let {
+                    viewmodel.navigateItemDetails(it)
+                }
+            },
+            CoroutineScope(Dispatchers.Default)
+        )
+        binding.itemsList.adapter = itemsAdapter
 
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewmodel = viewmodel
+
+        binding.itemsRefreshFab.setOnClickListener {
+            binding.swipeRefreshLayout.isRefreshing = true
+            viewmodel.refresh()
+            itemsAdapter.submitLoading()
+        }
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewmodel.refresh()
+            itemsAdapter.submitLoading()
+        }
 
         return binding.root
     }
@@ -66,14 +78,31 @@ class HomeFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 viewmodel.initCacheState.collect { state ->
-
-                    when(state){
-                        InitializationState.ERROR -> Timber.d("an error occured")
-                        InitializationState.INITIALIZED -> Timber.d("cache already initialized")
-                        InitializationState.NOT_INITIALIZED -> Timber.d("first time")
-                        InitializationState.REFRESH -> Timber.d("refresh")
-                        else -> Timber.d("unknown")
+                    state?.let {
+                        when (state) {
+                            InitializationState.ERROR -> {
+                                Toast.makeText(requireContext(),
+                                    "An error occured while fetching items",
+                                    Toast.LENGTH_SHORT).show()
+                            }
+                            InitializationState.INITIALIZED -> {}/*Toast.makeText(requireContext(), "Items Fetched", Toast.LENGTH_SHORT).show()*/
+                            InitializationState.NOT_INITIALIZED -> {
+                                Toast.makeText(requireContext(),
+                                        "Fetching Items",
+                                                Toast.LENGTH_SHORT).show()
+                            }
+                            InitializationState.REFRESH -> {
+                                Toast.makeText(requireContext(),
+                                    "Cache Refreshed",
+                                            Toast.LENGTH_SHORT).show()
+                                binding.swipeRefreshLayout.isRefreshing = false
+                            }
+                            else -> {
+                                binding.swipeRefreshLayout.isRefreshing = false
+                            }
+                        }
                     }
+                    viewmodel.onResetCacheStateValue()
                 }
             }
         }

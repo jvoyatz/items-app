@@ -20,8 +20,8 @@ class HomeViewModel @Inject constructor(val interactors: Interactors) : ViewMode
     val selectedItem: LiveData<Item?>
         get() = _selectedItem
 
-    private val _initCacheState = MutableStateFlow(InitializationState.UNKNOWN)
-    val initCacheState: StateFlow<InitializationState> = _initCacheState
+    private val _initCacheState:MutableStateFlow<InitializationState?> = MutableStateFlow(InitializationState.UNKNOWN)
+    val initCacheState: StateFlow<InitializationState?> = _initCacheState
 
     val itemsLiveData: LiveData<Resource<List<Item>>> = liveData {
         interactors.getItems()
@@ -38,6 +38,7 @@ class HomeViewModel @Inject constructor(val interactors: Interactors) : ViewMode
     init {
         viewModelScope.launch {
             interactors.initItems()
+                .onStart { delay(300) }
                 .catch {
                     Timber.d("caught an exception $it")
                     emit(InitializationState.ERROR)
@@ -48,6 +49,23 @@ class HomeViewModel @Inject constructor(val interactors: Interactors) : ViewMode
         }
     }
 
+    fun refresh(){
+        viewModelScope.launch {
+            interactors.initItems(true)
+                .onStart {
+                    delay(300)
+                }
+                .catch {
+                    emit(InitializationState.ERROR)
+                }
+                .collect {
+                    _initCacheState.value = it
+                }
+        }
+    }
+    fun onResetCacheStateValue(){
+        _initCacheState.value = null
+    }
     fun navigateItemDetails(item: Item) {
         _selectedItem.value = item
     }
