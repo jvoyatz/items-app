@@ -73,26 +73,3 @@ class HomeViewModel @Inject constructor(val interactors: Interactors) : ViewMode
         _selectedItem.value = null
     }
 }
-
-// alternative way
-//    val itemsLiveData: LiveData<Resource<List<Item>>> = liveData {
-//        interactors.getItems()
-//            .onStart {
-//                emit(Resource.Loading())
-//                delay(600)
-//            }
-//            .catch { emit(Resource.Error.create(it)) }
-//            .asLiveData()
-//    }
-
-
-
-//class Factory(private val application: Application, private val repository: ItemsRepository): ViewModelProvider.Factory {
-//    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-//        if(modelClass.isAssignableFrom(HomeViewModel::class.java)){
-//            return HomeViewModel(application, repository) as T
-//        }
-//
-//        throw IllegalArgumentException("wrong class")
-//    }
-//}

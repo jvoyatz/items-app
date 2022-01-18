@@ -11,8 +11,10 @@ import com.jvoyatz.kotlin.viva.databinding.FragmentDetailBinding
 import com.jvoyatz.kotlin.viva.databinding.FragmentHomeBinding
 import timber.log.Timber
 
+/**
+ * displaying item details
+ */
 class DetailFragment : Fragment() {
-
     private var _binding : FragmentDetailBinding? = null
     private val binding
         get() = _binding!!

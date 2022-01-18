@@ -23,6 +23,11 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+/**
+ * shows a recyclerview with a floaring action button
+ * which gives the ability to refresh the local storage
+ * and consequently the uiq
+ */
 
 //since parent activity of this fragment participates
 //in Hilt injection, then this class needs to be annotated too.
@@ -113,20 +118,6 @@ class HomeFragment : Fragment() {
                 viewmodel.onDoneNavigating()
             }
         })
-
-//        viewmodel.itemsLiveData.observe(viewLifecycleOwner, {
-//            it?.let {
-//                when(it){
-//                    is Resource.Loading -> Timber.d("show loading")
-//                    is Resource.Success -> {
-//                        val adapter = binding.itemsList.adapter as ItemsAdapter
-//                        adapter.submitWithHeader(getString(R.string.items_header_results), it.data)
-//                    }
-//                    is Resource.Error -> Timber.d("error")
-//                }
-//            }
-//        })
-
     }
 
     override fun onDestroyView() {

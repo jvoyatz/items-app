@@ -29,8 +29,6 @@ interface ItemsDao {
 
 }
 
-
-
 @Database(entities = [ItemEntity::class], version = 1, exportSchema = false)
 abstract class ItemsDatabase: RoomDatabase() {
     abstract val itemsDao: ItemsDao

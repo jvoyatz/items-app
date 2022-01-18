@@ -5,6 +5,9 @@ import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
+/**
+ * used to wrap elements displayed in the ui
+ */
 sealed class Resource<T>() {
     class Loading<T>: Resource<T>()
     data class Success<T>(val data:T): Resource<T>()

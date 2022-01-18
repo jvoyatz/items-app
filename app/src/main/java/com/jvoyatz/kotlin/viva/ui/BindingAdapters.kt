@@ -12,6 +12,9 @@ import com.jvoyatz.kotlin.viva.ui.home.ItemsAdapter
 import com.jvoyatz.kotlin.viva.util.Resource
 import timber.log.Timber
 
+/**
+ * custom xml attributes declared here
+ */
 
 @BindingAdapter("imgUrl")
 fun bindImage(imgView: ImageView, imageUrl: String?){

@@ -15,6 +15,7 @@ import com.jvoyatz.kotlin.viva.R;
 
 
 /**
+ * custom view
  * Found here:
  * https://stackoverflow.com/questions/37741872/how-to-make-custom-dotted-progress-bar-in-android
  */
