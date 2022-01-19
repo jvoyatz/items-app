@@ -6,11 +6,11 @@
     <data>
         <variable
             name="item"
-            type="com.jvoyatz.kotlin.viva.domain.Item" />
+            type="com.jvoyatz.kotlin.items.domain.Item" />
 
         <variable
             name="listener"
-            type="com.jvoyatz.kotlin.viva.ui.home.ItemsListener" />
+            type="com.jvoyatz.kotlin.items.ui.home.ItemsListener" />
     </data>
 
     <com.google.android.material.card.MaterialCardView

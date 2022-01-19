@@ -11,7 +11,7 @@ android {
     compileSdk 31
 
     defaultConfig {
-        applicationId "com.jvoyatz.kotlin.viva"
+        applicationId "com.jvoyatz.kotlin.items"
         minSdk 26
         targetSdk 31
         versionCode 1

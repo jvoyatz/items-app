@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/listFragment"
-        android:name="com.jvoyatz.kotlin.viva.ui.home.HomeFragment"
+        android:name="com.jvoyatz.kotlin.items.ui.home.HomeFragment"
         android:label="@string/fragment_home_title"
         tools:layout="@layout/fragment_home" >
         <action
@@ -21,11 +21,11 @@
     </fragment>
     <fragment
         android:id="@+id/detailFragment"
-        android:name="com.jvoyatz.kotlin.viva.ui.detail.DetailFragment"
+        android:name="com.jvoyatz.kotlin.items.ui.detail.DetailFragment"
         android:label="@string/fragment_detail_title"
         tools:layout="@layout/fragment_detail" >
         <argument
             android:name="item"
-            app:argType="com.jvoyatz.kotlin.viva.domain.Item"/>
+            app:argType="com.jvoyatz.kotlin.items.domain.Item"/>
     </fragment>
 </navigation>

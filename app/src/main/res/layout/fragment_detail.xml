@@ -7,7 +7,7 @@
 
         <variable
             name="item"
-            type="com.jvoyatz.kotlin.viva.domain.Item" />
+            type="com.jvoyatz.kotlin.items.domain.Item" />
 
         <import type="android.text.TextUtils"/>
     </data>

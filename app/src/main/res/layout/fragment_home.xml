@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.jvoyatz.kotlin.viva.ui.home.HomeViewModel" />
+            type="com.jvoyatz.kotlin.items.ui.home.HomeViewModel" />
     </data>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
